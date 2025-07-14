@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Detail</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { background: white; padding: 20px; border-radius: 10px; max-width: 700px; margin: auto; }
+    button { margin: 10px 5px; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
+    #message { color: green; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Question Detail</h2>
+    <div id="details"></div>
+    <div id="actions">
+      <button onclick="markComplete()">✅ Mark as Complete</button>
+      <button onclick="requestRevision()">🔁 Request Revision</button>
+    </div>
+    <p id="message"></p>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    let questions = JSON.parse(localStorage.getItem("questions") || "[]");
+    let question = questions.find(q => q.id === id);
+    const detailDiv = document.getElementById("details");
+    const message = document.getElementById("message");
+
+    if (!question) {
+      detailDiv.innerHTML = "<p>Question not found.</p>";
+    } else {
+      const submittedDate = new Date(question.submittedAt);
+      const now = new Date();
+      const diff = now - submittedDate;
+      const threeDays = 3 * 24 * 60 * 60 * 1000;
+      if (diff > threeDays && question.status !== "complete") {
+        question.status = "complete";
+        message.textContent = "⏱️ Auto-marked as complete after 3 days.";
+        localStorage.setItem("questions", JSON.stringify(questions));
+      }
+      detailDiv.innerHTML = \`
+        <p><strong>Subject:</strong> \${question.subject}</p>
+        <p><strong>Level:</strong> \${question.level}</p>
+        <p><strong>Pages:</strong> \${question.pages}</p>
+        <p><strong>Deadline:</strong> \${question.deadline}</p>
+        <p><strong>Question:</strong><br/>\${question.question}</p>
+        <p><strong>Status:</strong> \${question.status}</p>
+      \`;
+    }
+
+    function markComplete() {
+      question.status = "complete";
+      message.textContent = "✅ Marked as complete.";
+      localStorage.setItem("questions", JSON.stringify(questions));
+    }
+
+    function requestRevision() {
+      const reason = prompt("Enter revision request:");
+      if (reason) {
+        question.status = "revision requested";
+        message.textContent = "🔁 Revision requested: " + reason;
+        localStorage.setItem("questions", JSON.stringify(questions));
+      }
+    }
+  </script>
+</body>
+</html>

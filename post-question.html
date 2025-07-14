@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post a Homework Question</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    form { max-width: 700px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    label, input, select, textarea { display: block; width: 100%; margin-top: 15px; }
+    button { margin-top: 20px; padding: 10px 20px; background: #0073e6; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <form id="questionForm">
+    <h2>Post Your Question</h2>
+    <label>Subject</label>
+    <select name="subject" required>
+      <option value="">Select Subject</option>
+      <option>Math</option><option>Science</option><option>Literature</option>
+    </select>
+    <label>Academic Level</label>
+    <select name="level" required>
+      <option value="">Select Level</option>
+      <option>Elementary</option><option>High School</option><option>College</option>
+    </select>
+    <label>Number of Pages</label>
+    <input type="number" name="pages" required />
+    <label>Delivery Timeline</label>
+    <input type="text" name="deadline" placeholder="e.g., 2 days or 48 hours" required />
+    <label>Your Question</label>
+    <textarea name="question" rows="5" required></textarea>
+    <label>Attach File</label>
+    <input type="file" name="file" />
+    <button type="submit">Submit</button>
+  </form>
+  <script>
+    document.getElementById("questionForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const question = {
+        id: Date.now(),
+        subject: formData.get("subject"),
+        level: formData.get("level"),
+        pages: formData.get("pages"),
+        deadline: formData.get("deadline"),
+        question: formData.get("question"),
+        status: "pending",
+        submittedAt: new Date().toISOString()
+      };
+      let questions = JSON.parse(localStorage.getItem("questions") || "[]");
+      questions.push(question);
+      localStorage.setItem("questions", JSON.stringify(questions));
+      alert("Question submitted!");
+      this.reset();
+    });
+  </script>
+</body>
+</html>
